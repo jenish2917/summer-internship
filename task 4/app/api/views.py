@@ -12,6 +12,7 @@ from django.http import Http404
 from rest_framework import mixins, generics, viewsets
 from blogs.serializers import BlogSerializer, CommentSerializer
 from blogs.models import Blog, Comment
+from employees.filters import EmployeeFilter 
 
 @api_view(['GET', 'POST'])
 def studentsView(request):
@@ -197,6 +198,7 @@ class EmployeeViewset(viewsets.ModelViewSet):
     queryset = Employee.objects.all()
     serializer_class = EmployeeSerializer
     lookup_field = 'pk' 
+    filterset_class = EmployeeFilter 
 
 class BlogsView(generics.ListCreateAPIView):
     queryset = Blog.objects.all()
@@ -206,8 +208,12 @@ class CommentsView(generics.ListCreateAPIView):
     queryset = Comment.objects.all()
     serializer_class = CommentSerializer
 
-    def get_queryset(self):
-        blog_id = self.request.query_params.get('blog_id', None)
-        if blog_id is not None:
-            return self.queryset.filter(blog__id=blog_id)
-        return self.queryset 
+class BlogDetailView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Blog.objects.all()
+    serializer_class = BlogSerializer
+    lookup_field = 'pk'
+
+class CommentDetailView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Comment.objects.all()
+    serializer_class = CommentSerializer
+    lookup_field = 'pk'
